@@ -120,7 +120,7 @@ The application loads previously trained models and evaluates uploaded test data
 Room_Occupancy_ML/
 │
 ├── app.py
-├── train_models.ipynb
+├── ML Assignment 2.ipynb
 ├── requirements.txt
 ├── README.md
 ├── test_data.csv
