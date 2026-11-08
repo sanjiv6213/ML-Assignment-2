@@ -4,44 +4,74 @@
 
 The objective of this project is to estimate the number of people occupying a room using environmental sensor measurements.
 
-Five machine learning classification algorithms are implemented and evaluated to identify the model that performs best in predicting room occupancy.
+This project implements and compares five machine learning classification algorithms to identify the model that provides the best performance in predicting room occupancy.
 
-The project also provides an interactive Streamlit dashboard where users can upload test data, select a trained model and view its evaluation results.
+An interactive Streamlit dashboard is also developed to allow users to upload test datasets, select trained machine learning models and evaluate their performance.
 
 ## 2. Dataset Description
 
-**Dataset:** UCI Room Occupancy Estimation
+**Dataset Name:** UCI Room Occupancy Estimation
 
-**Source:** [UCI Machine Learning Repository](https://archive.ics.uci.edu/static/public/864/Occupancy_Estimation.csv)
+**Dataset Source:** [UCI Machine Learning Repository – Room Occupancy Estimation](https://archive.ics.uci.edu/static/public/864/Occupancy_Estimation.csv)
 
-The dataset contains environmental sensor readings collected for estimating room occupancy.
+**Dataset DOI:** 10.24432/C5P605
 
-| Dataset attribute | Description |
+The dataset contains environmental sensor readings collected to estimate the number of people occupying a room.
+
+| Dataset Attribute | Description |
 |---|---|
-| Total instances | 10,129 |
-| Input features | 16 sensor variables |
-| Target variable | Room_Occupancy_Count |
-| Number of classes | 4 |
-| Problem type | Multiclass classification |
+| Total Instances | 10,129 |
+| Total Original Columns | 19 |
+| Input Features Used | 16 |
+| Target Variable | Room_Occupancy_Count |
+| Number of Classes | 4 |
+| Problem Type | Multiclass Classification |
 
-The 16 input features include temperature, light, sound, CO2, CO2 slope and PIR sensor measurements.
+### Input Features
 
-The target variable represents four occupancy levels:
+The following 16 sensor measurements were used:
 
-- 0 – Empty
-- 1 – One Person
-- 2 – Two People
-- 3 – Three People
+- S1_Temp, S2_Temp, S3_Temp, S4_Temp
+- S1_Light, S2_Light, S3_Light, S4_Light
+- S1_Sound, S2_Sound, S3_Sound, S4_Sound
+- S5_CO2
+- S5_CO2_Slope
+- S6_PIR
+- S7_PIR
 
-The Date and Time columns were excluded from the model input.
+The Date and Time columns were excluded from model training.
 
-## 3. GitHub Repository Link
+### Target Variable
 
-**GitHub Repository:** [Add your GitHub repository link here]
+The target variable is `Room_Occupancy_Count`, which represents four occupancy levels:
 
-## 4. Machine Learning Models Used
+| Target Value | Occupancy Class |
+|---|---|
+| 0 | Empty |
+| 1 | One Person |
+| 2 | Two People |
+| 3 | Three People |
 
-The following five classification algorithms were implemented using the same dataset:
+The dataset was checked for missing values and duplicate records before model development.
+
+## 3. Data Preprocessing and Model Development
+
+The dataset was divided into training and testing sets using an 80:20 split.
+
+- Training data: 80%
+- Testing data: 20%
+- Random state: 42
+- Stratified sampling was used to maintain class proportions.
+
+Feature scaling was applied using StandardScaler for Logistic Regression, KNN, Gaussian Naive Bayes and SVM through Scikit-learn pipelines.
+
+Decision Tree was implemented without feature scaling.
+
+All five models were trained using the same training and testing split. The trained models were saved as Joblib files for subsequent evaluation through the Streamlit application.
+
+## 4. Machine Learning Models Implemented
+
+The following five classification algorithms were implemented:
 
 1. Logistic Regression
 2. Decision Tree Classifier
@@ -49,80 +79,105 @@ The following five classification algorithms were implemented using the same dat
 4. Gaussian Naive Bayes
 5. Support Vector Machine (SVM)
 
-The dataset was divided into 80% training data and 20% testing data using a stratified train-test split with random state 42.
+## 5. Model Performance Evaluation
 
-Feature scaling was applied through pipelines for Logistic Regression, KNN, Gaussian Naive Bayes and SVM. Decision Tree was implemented without feature scaling.
+The models were evaluated using six performance metrics:
 
-### 4.1 Model Performance Comparison
+- **Accuracy:** Measures the proportion of correctly classified observations.
+- **AUC:** Measures the model's ability to distinguish between classes using the One-vs-Rest approach.
+- **Precision:** Measures the proportion of positive predictions that are correct.
+- **Recall:** Measures the proportion of actual observations correctly identified.
+- **F1 Score:** Harmonic mean of precision and recall.
+- **MCC:** Matthews Correlation Coefficient, which evaluates classification quality considering all confusion matrix categories.
 
-The following metrics were calculated on the original test dataset.
+Precision, Recall and F1 Score are calculated using macro averaging. AUC uses macro-averaged One-vs-Rest calculation.
 
-| ML Model | Accuracy | AUC | Precision | Recall | F1 Score | MCC |
+### 5.1 Model Comparison Table
+
+The following results were obtained from the original test dataset.
+
+| Model | Accuracy | AUC | Precision | Recall | F1 Score | MCC |
 |---|---:|---:|---:|---:|---:|---:|
 | Logistic Regression | 0.9946 | 0.9996 | 0.9850 | 0.9803 | 0.9822 | 0.9834 |
 | Decision Tree | 0.9961 | 0.9929 | 0.9871 | 0.9874 | 0.9871 | 0.9880 |
 | KNN | 0.9951 | 0.9979 | 0.9823 | 0.9845 | 0.9833 | 0.9850 |
 | Naive Bayes | 0.9615 | 0.9931 | 0.8809 | 0.8880 | 0.8821 | 0.8844 |
-| Support Vector Machine | **0.9970** | **0.9996** | **0.9898** | **0.9925** | **0.9911** | **0.9910** |
+| **Support Vector Machine** | **0.9970** | **0.9996** | **0.9898** | **0.9925** | **0.9911** | **0.9910** |
 
-*Precision, Recall and F1 Score are macro-averaged. AUC is calculated using the One-vs-Rest approach with macro averaging.*
+### 5.2 Observations on Individual Models
 
-### 4.2 Observations on Model Performance
+**1. Logistic Regression**
 
-**Logistic Regression**
+Logistic Regression achieved an accuracy of 99.46% and a macro F1 score of 0.9822. It performed well across all occupancy classes. However, its recall for the Three People class was slightly lower compared to the other classes.
 
-Logistic Regression achieved 99.46% accuracy and a macro F1 score of 0.9822. It performed well across all occupancy classes, although its recall for the Three People class was slightly lower.
+**2. Decision Tree**
 
-**Decision Tree**
+Decision Tree achieved an accuracy of 99.61% and a macro F1 score of 0.9871. It provided strong classification performance across all four occupancy classes and maintained a good balance between precision and recall.
 
-Decision Tree achieved 99.61% accuracy and a macro F1 score of 0.9871. It provided strong classification performance across all four occupancy classes.
+**3. K-Nearest Neighbors (KNN)**
 
-**K-Nearest Neighbors (KNN)**
+KNN achieved an accuracy of 99.51% and a macro F1 score of 0.9833. It performed consistently across the occupancy classes, with particularly strong recall for the Two People class.
 
-KNN achieved 99.51% accuracy and a macro F1 score of 0.9833. It performed consistently across the occupancy classes, with particularly strong recall for the Two People class.
+**4. Gaussian Naive Bayes**
 
-**Gaussian Naive Bayes**
+Naive Bayes achieved an accuracy of 96.15% and a macro F1 score of 0.8821. It performed well for the Empty and One Person classes but showed comparatively lower precision and recall for the Two People and Three People classes.
 
-Naive Bayes achieved 96.15% accuracy and a macro F1 score of 0.8821. It performed well for the Empty and One Person classes but showed comparatively lower precision and recall for the Two People and Three People classes.
+**5. Support Vector Machine (SVM)**
 
-**Support Vector Machine (SVM)**
+SVM achieved an accuracy of 99.70%, a macro F1 score of 0.9911 and an MCC score of 0.9910. It demonstrated the strongest overall classification performance among the five evaluated models.
 
-SVM achieved the highest accuracy of 99.70%, a macro F1 score of 0.9911 and an MCC score of 0.9910. It demonstrated the strongest overall classification performance among the five models.
+### 5.3 Overall Best Model
 
-### 4.3 Overall Winner
+**Support Vector Machine (SVM) is the overall best-performing model.**
 
-**Support Vector Machine (SVM)** is the overall winner for this dataset.
+It achieved:
 
-It achieved the highest accuracy, precision, recall, F1 score and MCC among the five evaluated models. Its AUC score was also tied for the highest value at 0.9996.
+- Highest Accuracy: 0.9970
+- Highest Precision: 0.9898
+- Highest Recall: 0.9925
+- Highest F1 Score: 0.9911
+- Highest MCC: 0.9910
+- AUC: 0.9996, tied with Logistic Regression for the highest score.
 
-Therefore, SVM demonstrated the best overall performance on the original test dataset.
+Based on these results, SVM demonstrated the best overall performance for room occupancy estimation on the selected test dataset.
 
-## 5. Streamlit Application
+## 6. Streamlit Application
 
-The project includes an interactive Streamlit dashboard with the following features:
+An interactive web application was developed using Streamlit to evaluate the saved machine learning models.
 
-- CSV test dataset upload.
-- Machine learning model selection.
-- Dataset overview and occupancy distribution.
-- Evaluation metrics: Accuracy, AUC, Precision, Recall, F1 Score and MCC.
-- Confusion matrix.
-- Classification report.
-- Performance comparison across all five models.
-- Dataset exploration and CSV download.
+### Application Features
 
-The application loads previously trained models and evaluates uploaded test data without retraining.
+- Upload a CSV test dataset containing sensor features and the target variable.
+- Preview uploaded dataset records.
+- View dataset information and occupancy classes.
+- Select one of the five trained machine learning models.
+- Calculate Accuracy, AUC, Precision, Recall, F1 Score and MCC.
+- Display a confusion matrix.
+- Display a classification report.
+- Compare the performance of all five models.
 
-**Live Streamlit Application:** [Add your deployed Streamlit application link here]
+The application loads the previously trained models from the `model` directory. It evaluates the uploaded test dataset without retraining the models.
 
-## 6. Project Structure
+### Live Application
+
+[**Open Room Occupancy Estimation – Streamlit Application**](https://sanjiv6213-ml-assignment-2-app-frquqt.streamlit.app/)
+
+## 7. GitHub Repository
+
+The complete source code, training notebook, saved models, test dataset and application dependencies are available in the GitHub repository.
+
+[**View GitHub Repository – ML Assignment 2**](https://github.com/sanjiv6213/ML-Assignment-2/tree/main)
+
+## 8. Project Structure
 
 ```text
-Room_Occupancy_ML/
+ML-Assignment-2/
 │
 ├── app.py
-├── ML Assignment 2.ipynb
-├── requirements.txt
+├── ML_Assignment_2.ipynb
 ├── README.md
+├── requirements.txt
+├── Occupancy_Estimation.csv
 ├── test_data.csv
 ├── model_comparison.csv
 │
@@ -134,23 +189,24 @@ Room_Occupancy_ML/
     └── svm.joblib
 ```
 
-## 7. Technologies Used
+## 9. Technologies Used
 
-- Python
-- Pandas
-- NumPy
-- Scikit-learn
-- Matplotlib
-- Seaborn
-- Joblib
-- Streamlit
-- Google Colab
-- Visual Studio Code
+- **Programming Language:** Python
+- **Data Processing:** Pandas, NumPy
+- **Machine Learning:** Scikit-learn
+- **Model Persistence:** Joblib
+- **Data Visualization:** Matplotlib, Seaborn
+- **Web Application:** Streamlit
+- **Development Environment:** Google Colab, Visual Studio Code
+- **Version Control:** Git and GitHub
+- **Deployment:** Streamlit Community Cloud
 
-## 8. Conclusion
+## 10. Conclusion
 
-This project demonstrates the implementation and comparison of five machine learning classification algorithms for room occupancy estimation.
+This project demonstrates the implementation and comparison of five machine learning classification algorithms for estimating room occupancy using environmental sensor measurements.
 
-The results show that Support Vector Machine achieved the best overall performance, while Gaussian Naive Bayes had comparatively lower performance on this dataset.
+The models were evaluated using six performance metrics. Among the five algorithms, Support Vector Machine achieved the best overall performance, while Gaussian Naive Bayes showed comparatively lower performance.
 
-The Streamlit application provides an interactive interface for evaluating the saved models using uploaded test data.
+The Streamlit dashboard provides an interactive interface to evaluate the saved models using uploaded test data without requiring model retraining.
+
+The project demonstrates the application of machine learning techniques for sensor-based room occupancy estimation.
