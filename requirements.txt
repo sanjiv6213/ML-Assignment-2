@@ -1,9 +1,9 @@
 streamlit
 pandas
-numpy==2.2.6
-scipy==1.15.3
+numpy
 scikit-learn==1.6.1
-joblib==1.6.0
-threadpoolctl==3.7.0
+scipy==1.16.3
+joblib
+threadpoolctl
 matplotlib
 seaborn
