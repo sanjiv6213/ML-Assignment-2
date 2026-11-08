@@ -1,8 +1,8 @@
 streamlit
 pandas
 numpy
-scikit-learn==1.6.1
-scipy==1.16.3
+scikit-learn
+scipy
 joblib
 threadpoolctl
 matplotlib
